@@ -4,14 +4,17 @@
     Equipment system is very important in the Game, specially in MMO Game.
 
     Normally, equipment system contains tow important parts. 
+
     Since the appearance of equipments are different(the mesh are different), so to merge these meshes together is necessary. 
+        1. 合并网格
     Second, after merge meshes, the new mesh contains many materials(in this project, it has 4 material), that means it has at least 4 drawcalls(depends in the shader).
+        2. 合并material
+
     So to merge materials together will reduce drawcalls and improve game performance.
 
  
  * 换装系统包含两个重要的部分，由于身体的各个部件是单独的prefab，因此需要合并其Mesh和Material
  * 
-
 */
 
 using UnityEngine;
@@ -26,8 +29,8 @@ public class App
 
 	public static App Game { get { return app; } }
 
-	private UCharacterMgr characterMgr = new UCharacterMgr ();
-	public UCharacterMgr CharacterMgr { get { return characterMgr; } }
+	private UCharacterManager characterMgr = new UCharacterManager ();
+	public UCharacterManager CharacterMgr { get { return characterMgr; } }
 
 	public void Update ()
 	{
@@ -38,20 +41,23 @@ public class App
 public class Main : MonoBehaviour {
 
 	private readonly string[] index = new string[]{ "004", "006", "008" };
+
     /// <summary>
     /// Config default equipment informations.
+    /// 默认的装扮编号
     /// </summary>
 	private const int DEFAULT_WEAPON = 0;
 	private const int DEFAULT_HEAD = 2;
 	private const int DEFAULT_CHEST = 0;
 	private const int DEFAULT_HAND = 0;
 	private const int DEFAULT_FEET = 1;
-	private const bool DEFAULT_COMBINEMATERIAL = true;
+	private const bool DEFAULT_COMBINEMATERIAL = true;          // 合并Material
 	
     /// <summary>
     /// Use this for GUI display.
+    /// GUI
     /// </summary>
-	private bool combine = DEFAULT_COMBINEMATERIAL;
+	private bool combineMaterial = DEFAULT_COMBINEMATERIAL;
 	private bool[] weapon_list = new bool[3];
 	private bool[] head_list = new bool[3];
 	private bool[] chest_list = new bool[3];
@@ -60,13 +66,13 @@ public class Main : MonoBehaviour {
     
     /// <summary>
     /// The avatar in the scene.
+    /// 场景中的人物（控制器）
     /// </summary>
 	private UCharacterController character = null;
 
 	// Use this for initialization
 	void Start () 
     {
-
         // for GUI display
 		weapon_list [DEFAULT_WEAPON] = true;
 		head_list [DEFAULT_HEAD] = true;
@@ -75,6 +81,7 @@ public class Main : MonoBehaviour {
 		feet_list [DEFAULT_FEET] = true;
 
         // create an avatar
+        // 实例化一个新的人物
 		character = App.Game.CharacterMgr.Generatecharacter (
 			"ch_pc_hou", 
 			"ch_we_one_hou_" + index[DEFAULT_WEAPON],
@@ -82,11 +89,12 @@ public class Main : MonoBehaviour {
 			"ch_pc_hou_" + index[DEFAULT_CHEST] + "_shen", 
 			"ch_pc_hou_" + index[DEFAULT_HAND] + "_shou", 
 			"ch_pc_hou_" + index[DEFAULT_FEET] + "_jiao",
-			combine);
+			combineMaterial);
 		character.Instance.transform.position = new Vector3 (0, -1, -5);
 		character.Instance.transform.eulerAngles = new Vector3 (0, 180, 0);
+        character.Instance.AddComponent<TestDNA>();
 	}
-	
+	public 
 	// Update is called once per frame
 	void Update () 
     {
@@ -132,7 +140,7 @@ public class Main : MonoBehaviour {
 					}
 					head_list [i] = true;
 
-					character.ChangeHeadEquipment ("ch_pc_hou_" + index[i] + "_tou", combine);
+					character.ChangeHeadEquipment ("ch_pc_hou_" + index[i] + "_tou", combineMaterial);
 				}
 			}
 		}
@@ -151,7 +159,7 @@ public class Main : MonoBehaviour {
 					}
 					chest_list [i] = true;
 
-					character.ChangeChestEquipment ("ch_pc_hou_" + index[i] + "_shen", combine);
+					character.ChangeChestEquipment ("ch_pc_hou_" + index[i] + "_shen", combineMaterial);
 				}
 			}
 		}
@@ -170,7 +178,7 @@ public class Main : MonoBehaviour {
 					}
 					hand_list [i] = true;
 
-					character.ChangeHandEquipment("ch_pc_hou_" + index[i] + "_shou", combine);
+					character.ChangeHandEquipment("ch_pc_hou_" + index[i] + "_shou", combineMaterial);
 				}
 			}
 		}
@@ -189,7 +197,7 @@ public class Main : MonoBehaviour {
 					}
 					feet_list [i] = true;
 
-					character.ChangeFeetEquipment("ch_pc_hou_" + index[i] + "_jiao", combine);
+					character.ChangeFeetEquipment("ch_pc_hou_" + index[i] + "_jiao", combineMaterial);
 				}
 			}
 		}
@@ -218,9 +226,9 @@ public class Main : MonoBehaviour {
 			}
 		}
 
-        if (GUI.Button(new Rect(Screen.width - 150, 100, 150, 50), combine ? "Merge materials(√)" : "Merge materials"))
+        if (GUI.Button(new Rect(Screen.width - 150, 100, 150, 50), combineMaterial ? "Merge materials(√)" : "Merge materials"))
         {
-            combine = !combine;
+            combineMaterial = !combineMaterial;
         }
     }
 

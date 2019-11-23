@@ -20,11 +20,8 @@ public class UCombineSkinnedMgr
     /// 因为最终要合并，所以并不用把各部件的骨头设置父节点成骨架。
     /// 然而武器就不一样了，武器并不参与合并，所以还是要设置父节点。
     /// </summary>
-    /// <param name="skeleton">combine meshes to this skeleton(a gameobject)</param>
-    /// <param name="meshes">meshes need to be merged</param>
-    /// <param name="combine">merge materials or not</param>
-	public void CombineObject (GameObject skeleton, 
-        SkinnedMeshRenderer[] meshes, bool combine = false)
+	public void CombineSkinnedMesh (GameObject skeleton, 
+        SkinnedMeshRenderer[] srcSkinnedMeshRenderer, bool combine = false)
     {
 
 		// Fetch all bones of the skeleton
@@ -50,9 +47,9 @@ public class UCombineSkinnedMgr
 
 		// Collect information from meshes
         // 这里分别把所有Material，Mesh，Transform(骨头)保存到对应的List
-		for (int i = 0; i < meshes.Length; i ++)
+		for (int i = 0; i < srcSkinnedMeshRenderer.Length; i ++)
 		{
-			SkinnedMeshRenderer smr = meshes[i];
+			SkinnedMeshRenderer smr = srcSkinnedMeshRenderer[i];
             // Collect materials
 			materials.AddRange(smr.materials); 
 
@@ -130,6 +127,7 @@ public class UCombineSkinnedMgr
         {
         	GameObject.DestroyImmediate (oldSKinned);
 		}
+
 		SkinnedMeshRenderer r = skeleton.AddComponent<SkinnedMeshRenderer>();
 		r.sharedMesh = new Mesh();
         // Combine meshes
